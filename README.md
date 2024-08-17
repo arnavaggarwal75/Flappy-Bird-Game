@@ -14,6 +14,10 @@ This project is a simple implementation of the classic Flappy Bird game in Java.
 
 The Flappy Bird game requires the player to navigate a bird through obstacles by making it jump at the right time. The game ends when the bird collides with a column or the ground. The player earns points by passing through the gaps between columns.
 
+## Example
+
+![start](public/start.png)    ![ingame](public/ingame.png)
+
 ## Getting Started
 
 ### Prerequisites
