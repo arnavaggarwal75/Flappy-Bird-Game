@@ -26,7 +26,7 @@ The Flappy Bird game requires the player to navigate a bird through obstacles by
 1. **Clone the Repository**
 
 ```bash
-   git clone https://github.com/arnavaggarwal75/Minimum-Snippet.git
+   git clone https://github.com/arnavaggarwal75/Flappy-Bird-Game.git
 ```
 2. **Open the Project**
 
