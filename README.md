@@ -16,7 +16,9 @@ The Flappy Bird game requires the player to navigate a bird through obstacles by
 
 ## Example
 
-![start](public/start.png)    ![ingame](public/ingame.png)
+![start](public/start.png)
+
+![ingame](public/ingame.png)
 
 ## Getting Started
 
