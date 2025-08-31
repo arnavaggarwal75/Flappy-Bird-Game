@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Random;
-import java.io.*;
 import java.nio.file.*;
 
 import javax.swing.JFrame;
