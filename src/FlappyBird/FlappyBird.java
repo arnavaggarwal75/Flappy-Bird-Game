@@ -14,6 +14,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Random;
+import java.io.*;
+import java.nio.file.*;
 
 import javax.swing.JFrame;
 
@@ -22,12 +24,13 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 	public static FlappyBird flappyBird;
 
 	public final static int WIDTH = 1200, HEIGHT = 800;
-	public int ticks, yMotion, score;
+	public int ticks, yMotion, score, bestScore;
 	public boolean gameOver, started;
 	public Renderer renderer; 
 	public Random random;
 	public Rectangle bird;
 	public ArrayList<Rectangle> columns;
+	private final String HIGH_SCORE_FILE = "flappy_bird_highscore.txt";
 	//Constructor
 	public FlappyBird() {
 		JFrame jframe = new JFrame();
@@ -35,6 +38,7 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 
 		renderer = new Renderer();
 		random = new Random();
+		loadHighScore();
 
 		jframe.add(renderer);
 		jframe.addMouseListener(this);
@@ -45,7 +49,7 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 		jframe.setResizable(false);
 		jframe.setVisible(true);
 
-		bird = new Rectangle(WIDTH/2-10, HEIGHT/2-10, 15, 15);
+		bird = new Rectangle(WIDTH/2-15, HEIGHT/2-15, 30, 30);
 		columns = new ArrayList<Rectangle>();
 		for(int i=0; i<4; i++) {
 			addColumn(true);
@@ -71,12 +75,63 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 		g.fillRect(column.x, column.y, column.width, column.height);
 	}
 
+	public void drawBird(Graphics g, int x, int y) {
+		// Bird body (yellow oval) - scaled up
+		g.setColor(Color.YELLOW);
+		g.fillOval(x, y + 6, 24, 16);
+		
+		// Bird head (yellow circle) - scaled up
+		g.fillOval(x + 16, y, 20, 20);
+		
+		// Beak (orange triangle) - scaled up
+		g.setColor(Color.ORANGE);
+		int[] beakX = {x + 36, x + 44, x + 36};
+		int[] beakY = {y + 6, y + 10, y + 14};
+		g.fillPolygon(beakX, beakY, 3);
+		
+		// Eye (black dot) - scaled up
+		g.setColor(Color.BLACK);
+		g.fillOval(x + 24, y + 4, 4, 4);
+		
+		// Wing (darker yellow) - scaled up
+		g.setColor(new Color(220, 220, 0));
+		g.fillOval(x + 4, y + 8, 12, 8);
+	}
+
+	public void loadHighScore() {
+		try {
+			if (Files.exists(Paths.get(HIGH_SCORE_FILE))) {
+				String content = Files.readString(Paths.get(HIGH_SCORE_FILE));
+				bestScore = Integer.parseInt(content.trim());
+			} else {
+				bestScore = 0;
+			}
+		} catch (Exception e) {
+			bestScore = 0;
+		}
+	}
+	
+	public void saveHighScore() {
+		try {
+			Files.writeString(Paths.get(HIGH_SCORE_FILE), String.valueOf(bestScore));
+		} catch (Exception e) {
+			System.err.println("Failed to save high score: " + e.getMessage());
+		}
+	}
+
+	public void updateBestScore() {
+		if (score > bestScore) {
+			bestScore = score;
+			saveHighScore();
+		}
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		ticks++;
 		int speed = 8;
 
-		if(started) {
+		if(started && !gameOver) {
 
 
 			for(int i=0; i<columns.size(); i++) {
@@ -107,11 +162,13 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 				if(column.intersects(bird)) {
 					gameOver = true;
 					bird.x = column.x - bird.width;
+					updateBestScore();
 				}
 			}
 
 			if(bird.y>=HEIGHT-150||bird.y<0) {
 				gameOver = true;
+				updateBestScore();
 			}
 
 			if(bird.y + yMotion >= HEIGHT - 150) {
@@ -141,8 +198,7 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 		g.fillRect(0, HEIGHT-150, WIDTH, 20);
 
 		//Bird
-		g.setColor(Color.red);
-		g.fillRect(bird.x, bird.y, bird.width, bird.height);
+		drawBird(g, bird.x, bird.y);
 
 		for(Rectangle column : columns) {
 			paintColumn(g, column);
@@ -156,7 +212,23 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 
 		}
 		if(gameOver) {
-			g.drawString("Game Over", 75, HEIGHT/2-50);
+			// Game Over title
+			g.setColor(Color.RED);
+			g.setFont(new Font("Arial", 1, 80));
+			g.drawString("Game Over", 150, HEIGHT/2-100);
+			
+			// Current score
+			g.setColor(Color.BLACK);
+			g.setFont(new Font("Arial", 1, 50));
+			g.drawString("Score: " + score, WIDTH/2-100, HEIGHT/2-20);
+			
+			// Best score
+			g.drawString("Best: " + bestScore, WIDTH/2-100, HEIGHT/2+40);
+			
+			// Restart instruction
+			g.setColor(Color.DARK_GRAY);
+			g.setFont(new Font("Arial", 1, 30));
+			g.drawString("Click or Press SPACE to restart", WIDTH/2-200, HEIGHT/2+100);
 		}
 		
 		if(!gameOver && started) {
@@ -166,7 +238,7 @@ public class FlappyBird implements ActionListener, MouseListener, KeyListener {
 
 	public void jump() {
 		if(gameOver) {
-			bird = new Rectangle(WIDTH/2 - 10, HEIGHT/2-10, 20, 20);
+			bird = new Rectangle(WIDTH/2-15, HEIGHT/2-15, 30, 30);
 			columns.clear();
 			yMotion = 0;
 			score = 0;
