@@ -1,0 +1,12 @@
+# Build outputs
+/bin/
+bin/
+/*.jar
+
+# IDE stuff
+*.class
+*.log
+*.DS_Store
+
+# Game runtime files
+flappy_bird_highscore.txt
