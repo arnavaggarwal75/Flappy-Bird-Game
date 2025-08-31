@@ -10,8 +10,8 @@ Control the bird using the **spacebar** or **mouse clicks** to avoid obstacles a
 - **Persistent High Score:** Saved between runs in `flappy_bird_highscore.txt`.
 
 ## Example
-![In Game](public/in-game.png)
-![Game Over](public/game-over.png)  
+![ingame](public/in-game.png)
+![gameover](public/game-over.png)
 
 ## Getting Started
 
